@@ -293,7 +293,9 @@ TEST(Slot, NoInit) {
   memset(&token_info, 0, sizeof(token_info));
   EXPECT_CKR(CKR_CRYPTOKI_NOT_INITIALIZED, g_fns->C_GetTokenInfo(g_slot_id, &token_info));
   CK_SLOT_ID slot_id = -1;
-  EXPECT_CKR(CKR_CRYPTOKI_NOT_INITIALIZED, g_fns->C_WaitForSlotEvent(CKF_DONT_BLOCK, &slot_id, NULL_PTR));
+  CK_RV rv;
+  rv = g_fns->C_WaitForSlotEvent(CKF_DONT_BLOCK, &slot_id, NULL_PTR);
+  EXPECT_TRUE(rv == CKR_CRYPTOKI_NOT_INITIALIZED  || rv == CKR_FUNCTION_NOT_SUPPORTED) << " rv=" << CK_RV_(rv);
   CK_ULONG mechanism_count;
   EXPECT_CKR(CKR_CRYPTOKI_NOT_INITIALIZED, g_fns->C_GetMechanismList(g_slot_id, NULL_PTR, &mechanism_count));
   CK_MECHANISM_INFO mechanism_info;
