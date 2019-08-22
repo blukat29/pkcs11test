@@ -392,8 +392,8 @@ TEST_P(SecretKeyTest, EncryptModePolicing2) {
 TEST_P(SecretKeyTest, EncryptInvalidIV) {
   if (!info_.has_iv) return;
   CK_MECHANISM mechanism = {info_.mode, iv_.get(), (CK_ULONG)(info_.blocksize - 1)};
-  EXPECT_CKR(CKR_MECHANISM_PARAM_INVALID,
-             g_fns->C_EncryptInit(session_, &mechanism, key_.handle()));
+  CK_RV rv = g_fns->C_EncryptInit(session_, &mechanism, key_.handle());
+  EXPECT_TRUE(rv == CKR_MECHANISM_PARAM_INVALID || rv == CKR_MECHANISM_INVALID) << " rv=" << CK_RV_(rv);
 
   /*
   // TODO: reinstate
@@ -406,8 +406,8 @@ TEST_P(SecretKeyTest, EncryptInvalidIV) {
 TEST_P(SecretKeyTest, DecryptInvalidIV) {
   if (!info_.has_iv) return;
   CK_MECHANISM mechanism = {info_.mode, iv_.get(), (CK_ULONG)(info_.blocksize - 1)};
-  EXPECT_CKR(CKR_MECHANISM_PARAM_INVALID,
-             g_fns->C_DecryptInit(session_, &mechanism, key_.handle()));
+  CK_RV rv = g_fns->C_DecryptInit(session_, &mechanism, key_.handle());
+  EXPECT_TRUE(rv == CKR_MECHANISM_PARAM_INVALID || rv == CKR_MECHANISM_INVALID) << " rv=" << CK_RV_(rv);
 
   /*
   // TODO: reinstate
