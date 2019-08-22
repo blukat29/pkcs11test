@@ -27,15 +27,16 @@ TEST_F(ReadWriteSessionTest, TookanAttackA1) {
   SecretKey k1(session_, k1_attrs);
 
   // Second, create a key k2 with wrap & decrypt
-  vector<CK_ATTRIBUTE_TYPE> k2_attrs = {CKA_WRAP, CKA_DECRYPT};
-  SecretKey k2(session_, k2_attrs);
+  vector<CK_ATTRIBUTE_TYPE> k2_public_attrs = {CKA_WRAP, CKA_ENCRYPT};
+  vector<CK_ATTRIBUTE_TYPE> k2_private_attrs = {CKA_UNWRAP, CKA_DECRYPT};
+  KeyPair k2(session_, k2_public_attrs, k2_private_attrs);
 
   // Use k2 to wrap k1.
-  CK_MECHANISM wrap_mechanism = {CKM_DES_ECB, NULL_PTR, 0};
+  CK_MECHANISM wrap_mechanism = {CKM_RSA_PKCS, NULL_PTR, 0};
   CK_BYTE data[4096];
   CK_ULONG data_len = sizeof(data);
   CK_RV rv;
-  rv = g_fns->C_WrapKey(session_, &wrap_mechanism, k2.handle(), k1.handle(), data, &data_len);
+  rv = g_fns->C_WrapKey(session_, &wrap_mechanism, k2.public_handle(), k1.handle(), data, &data_len);
   if (rv == CKR_FUNCTION_NOT_SUPPORTED) {
     TEST_SKIPPED("Key wrapping not supported");
     return;
@@ -45,7 +46,7 @@ TEST_F(ReadWriteSessionTest, TookanAttackA1) {
 
   if (rv == CKR_OK) {
     // Use k2 to decrypt the result, giving contents of k1.
-    EXPECT_CKR_OK(g_fns->C_DecryptInit(session_, &wrap_mechanism, k2.handle()));
+    EXPECT_CKR_OK(g_fns->C_DecryptInit(session_, &wrap_mechanism, k2.private_handle()));
     CK_ULONG key_out_len = sizeof(data);
     rv = g_fns->C_Decrypt(session_, data, data_len, data, &key_out_len);
     if (rv == CKR_OK) {
