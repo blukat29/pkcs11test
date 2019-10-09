@@ -190,11 +190,11 @@ TEST_F(ReadWriteSessionTest, CreateCopyDestroyObject) {
   CK_OBJECT_HANDLE object3;
   CK_BYTE facefeed[] = { 0xFA, 0xCE, 0xFE, 0xED};
   CK_ATTRIBUTE attrs3[] = {
-    {CKA_VALUE, facefeed, sizeof(facefeed)},
+    {CKA_LABEL, facefeed, sizeof(facefeed)},
   };
   EXPECT_CKR_OK(g_fns->C_CopyObject(session_, object, attrs3, 1, &object3));
 
-  CK_ATTRIBUTE get_value = {CKA_VALUE, buffer, sizeof(buffer)};
+  CK_ATTRIBUTE get_value = {CKA_LABEL, buffer, sizeof(buffer)};
   EXPECT_CKR_OK(g_fns->C_GetAttributeValue(session_, object3, &get_value, 1));
   EXPECT_EQ(sizeof(facefeed), get_value.ulValueLen);
   EXPECT_EQ(hex_data(facefeed, sizeof(facefeed)),
