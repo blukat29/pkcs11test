@@ -58,6 +58,7 @@ std::map<std::string, CipherInfo> kCipherInfo = {
   {"AES-ECB", {CKK_AES, CKM_AES_KEY_GEN, CKM_AES_ECB, 16, false, 16}},
   {"AES-CBC", {CKK_AES, CKM_AES_KEY_GEN, CKM_AES_CBC, 16, true, 16}},
   {"AES-CTR", {CKK_AES, CKM_AES_KEY_GEN, CKM_AES_CTR, 16, false, 16}},
+  {"AES-GCM", {CKK_AES, CKM_AES_KEY_GEN, CKM_AES_GCM, 16, false, 16}},
 };
 
 std::map<std::string, DigestInfo> kDigestInfo = {

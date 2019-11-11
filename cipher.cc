@@ -47,6 +47,10 @@ struct TestData {
 
 static CK_AES_CTR_PARAMS aes_ctr_param = {128, {0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}};
 
+static CK_BYTE aes_gcm_iv[] = {0x12,0x15,0x35,0x24,0xc0,0x89,0x5e,0x81,0xb2,0xc2,0x84,0x65};
+static CK_BYTE aes_gcm_aad[] = {0xd6,0x09,0xb1,0xf0,0x56,0x63,0x7a,0x0d,0x46,0xdf,0x99,0x8d,0x88,0xe5,0x2e,0x00,0xb2,0xc2,0x84,0x65,0x12,0x15,0x35,0x24,0xc0,0x89,0x5e,0x81};
+static CK_GCM_PARAMS aes_gcm_param = {aes_gcm_iv, sizeof(aes_gcm_iv), 0, aes_gcm_aad, sizeof(aes_gcm_aad), 128};
+
 map<string, vector<TestData> > kTestVectors = {
   { "DES-ECB", {{"8000000000000000", "", "0000000000000000", "95A8D72813DAA94D"},
                 {"4000000000000000", "", "0000000000000000", "0EEC1487DD8C26D5"}, }},
@@ -57,6 +61,9 @@ map<string, vector<TestData> > kTestVectors = {
   { "AES-CBC", {{"2b7e151628aed2a6abf7158809cf4f3c", "000102030405060708090A0B0C0D0E0F", "6bc1bee22e409f96e93d7e117393172a", "7649abac8119b246cee98e9b12e9197d"},
                 {"2b7e151628aed2a6abf7158809cf4f3c", "7649ABAC8119B246CEE98E9B12E9197D", "ae2d8a571e03ac9c9eb76fac45af8e51", "5086cb9b507219ee95db113a917678b2"}, }},
   { "AES-CTR", {{"2b7e151628aed2a6abf7158809cf4f3c", "", "6bc1bee22e409f96e93d7e117393172a", "874d6191b620e3261bef6864990db6ce", &aes_ctr_param, sizeof(aes_ctr_param)}, }},
+  { "AES-GCM", {{"ad7a2bd03eac835a6f620fdcb506b345", "", "08000f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a0002",
+                 "701afa1cc039c0d765128a665dab69243899bf7318ccdc81c9931da17fbe8edd7d17cb8b4c26fc81e3284f2b7fba713d4f8d55e7d3f06fd5a13c0c29b9d5b880",
+                 &aes_gcm_param, sizeof(aes_gcm_param)}, }},
 };
 
 }  // namespace
