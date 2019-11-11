@@ -41,7 +41,11 @@ struct TestData {
   string iv;  // Hex
   string plaintext;  // Hex
   string ciphertext;  // Hex
+  void* parameter;
+  unsigned long parameterLen;
 };
+
+static CK_AES_CTR_PARAMS aes_ctr_param = {128, {0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}};
 
 map<string, vector<TestData> > kTestVectors = {
   { "DES-ECB", {{"8000000000000000", "", "0000000000000000", "95A8D72813DAA94D"},
@@ -52,6 +56,7 @@ map<string, vector<TestData> > kTestVectors = {
                 {"2b7e151628aed2a6abf7158809cf4f3c", "", "ae2d8a571e03ac9c9eb76fac45af8e51", "f5d3d58503b9699de785895a96fdbaaf"}, }},
   { "AES-CBC", {{"2b7e151628aed2a6abf7158809cf4f3c", "000102030405060708090A0B0C0D0E0F", "6bc1bee22e409f96e93d7e117393172a", "7649abac8119b246cee98e9b12e9197d"},
                 {"2b7e151628aed2a6abf7158809cf4f3c", "7649ABAC8119B246CEE98E9B12E9197D", "ae2d8a571e03ac9c9eb76fac45af8e51", "5086cb9b507219ee95db113a917678b2"}, }},
+  { "AES-CTR", {{"2b7e151628aed2a6abf7158809cf4f3c", "", "6bc1bee22e409f96e93d7e117393172a", "874d6191b620e3261bef6864990db6ce", &aes_ctr_param, sizeof(aes_ctr_param)}, }},
 };
 
 }  // namespace
@@ -639,9 +644,15 @@ TEST_F(ReadOnlySessionTest, SecretKeyTestVectors) {
       ASSERT_CKR_OK(g_fns->C_CreateObject(session_, attrs.data(), attrs.size(), &key_object));
 
       string iv = hex_decode(testcase.iv);
-      CK_MECHANISM mechanism = {info.mode,
-                                (info.has_iv ? (CK_BYTE_PTR)iv.data() : NULL_PTR),
-                                (info.has_iv ? (CK_ULONG)info.blocksize : 0)};
+      CK_MECHANISM mechanism = {info.mode, NULL_PTR, 0};
+      if (info.has_iv) {
+          mechanism.pParameter = (CK_VOID_PTR)iv.data();
+          mechanism.ulParameterLen = info.blocksize;
+
+      } else if (testcase.parameter) {
+          mechanism.pParameter = testcase.parameter;
+          mechanism.ulParameterLen = testcase.parameterLen;
+      }
       ASSERT_CKR_OK(g_fns->C_EncryptInit(session_, &mechanism, key_object));
       string plaintext = hex_decode(testcase.plaintext);
       CK_BYTE ciphertext[1024];
