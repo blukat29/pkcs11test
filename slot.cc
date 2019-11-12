@@ -103,6 +103,11 @@ TEST_F(PKCS11Test, EnumerateMechanisms) {
     EXPECT_CKR_OK(g_fns->C_GetMechanismInfo(g_slot_id, mechanism_type, &mechanism_info));
     if (g_verbose) cout << "mechanism[" << ii << "]=" << mechanism_type_name(mechanism_type)
                         << " " << mechanism_info_description(&mechanism_info) << endl;
+
+    if (mechanism_type_name(mechanism_type) == "UNKNOWN") {
+      continue;
+    }
+
     EXPECT_LE(mechanism_info.ulMinKeySize, mechanism_info.ulMaxKeySize);
     // Check the expected functionality is available.
     CK_FLAGS expected_flags = CKF_HW;
@@ -302,7 +307,7 @@ TEST(Slot, NoInit) {
   EXPECT_CKR(CKR_CRYPTOKI_NOT_INITIALIZED, g_fns->C_GetMechanismInfo(g_slot_id, CKM_RSA_PKCS_KEY_PAIR_GEN, &mechanism_info));
   const char* label_str = "PKCS#11 Unit Test";
   CK_UTF8CHAR label[32];
-  memset(label, sizeof(label), ' ');
+  memset(label, ' ', sizeof(label));
   memcpy(label, label_str, strlen(label_str));  // Not including null terminator.
   EXPECT_CKR(CKR_CRYPTOKI_NOT_INITIALIZED, g_fns->C_InitToken(INVALID_SLOT_ID, (CK_UTF8CHAR_PTR)g_so_pin, strlen(g_so_pin), label));
   EXPECT_CKR(CKR_CRYPTOKI_NOT_INITIALIZED, g_fns->C_InitPIN(INVALID_SESSION_HANDLE, (CK_UTF8CHAR_PTR)g_user_pin, strlen(g_user_pin)));
