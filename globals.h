@@ -61,6 +61,14 @@ struct SignatureInfo {
 };
 extern std::map<std::string, SignatureInfo> kSignatureInfo;
 
+struct CurveInfo {
+  CK_MECHANISM_TYPE keygen_mechanism;
+  CK_MECHANISM_TYPE sign_mechanism;
+  CK_KEY_TYPE key_type;
+  std::string params; // BER-encoded OID in hex
+};
+extern std::map<std::string, CurveInfo> kCurveInfo;
+
 struct CipherInfo {
   CK_KEY_TYPE keytype;
   CK_MECHANISM_TYPE keygen;

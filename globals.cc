@@ -48,6 +48,13 @@ std::map<std::string, SignatureInfo> kSignatureInfo = {
   {"SHA512-RSA", {CKM_SHA512_RSA_PKCS, 1024}},
 };
 
+std::map<std::string, CurveInfo> kCurveInfo = {
+  {"P-256", { CKM_EC_KEY_PAIR_GEN, CKM_ECDSA, CKK_EC, "06082a8648ce3d030107"}},
+  {"P-384", { CKM_EC_KEY_PAIR_GEN, CKM_ECDSA, CKK_EC, "06052b81040022"}},
+  {"P-521", { CKM_EC_KEY_PAIR_GEN, CKM_ECDSA, CKK_EC, "06052b81040023"}},
+  {"secp256k1", { CKM_EC_KEY_PAIR_GEN, CKM_ECDSA, CKK_EC, "06052b8104000a"}},
+};
+
 std::map<std::string, CipherInfo> kCipherInfo = {
   {"DES-ECB", {CKK_DES, CKM_DES_KEY_GEN, CKM_DES_ECB, 8, false, -1}},
   {"DES-CBC", {CKK_DES, CKM_DES_KEY_GEN, CKM_DES_CBC, 8, true, -1}},

@@ -312,6 +312,56 @@ class KeyPair {
   CK_OBJECT_HANDLE private_key_;
 };
 
+class ECKeyPair {
+ public:
+  // Create a keypair with the given lists of (boolean) attributes set to true.
+  ECKeyPair(CK_SESSION_HANDLE session,
+          const ObjectAttributes& public_attrs,
+          const ObjectAttributes& private_attrs,
+          std::string params,
+          CK_MECHANISM_TYPE mechanism_type = CKM_EC_KEY_PAIR_GEN,
+          CK_KEY_TYPE key_type = CKK_EC)
+    : session_(session),
+      public_attrs_(public_attrs), private_attrs_(private_attrs),
+      public_key_(INVALID_OBJECT_HANDLE), private_key_(INVALID_OBJECT_HANDLE) {
+
+    CK_ATTRIBUTE key_type_attr = {CKA_KEY_TYPE, (CK_VOID_PTR)&key_type, sizeof(CK_KEY_TYPE)};
+    public_attrs_.push_back(key_type_attr);
+    private_attrs_.push_back(key_type_attr);
+
+    CK_ATTRIBUTE params_attr = {CKA_EC_PARAMS, (CK_VOID_PTR)params.data(), params.size()};
+    public_attrs_.push_back(params_attr);
+
+    CK_ATTRIBUTE public_object = {CKA_PRIVATE, (CK_VOID_PTR)&g_ck_false, sizeof(CK_BBOOL)};
+    public_attrs_.push_back(public_object);
+    private_attrs_.push_back(public_object);
+
+    CK_MECHANISM mechanism = {mechanism_type, NULL_PTR, 0};
+    EXPECT_CKR_OK(g_fns->C_GenerateKeyPair(session_, &mechanism,
+                                           public_attrs_.data(), public_attrs_.size(),
+                                           private_attrs_.data(), private_attrs_.size(),
+                                           &public_key_, &private_key_));
+  }
+  ~ECKeyPair() {
+    if (public_key_ != INVALID_OBJECT_HANDLE) {
+      EXPECT_CKR_OK(g_fns->C_DestroyObject(session_, public_key_));
+    }
+    if (private_key_ != INVALID_OBJECT_HANDLE) {
+      EXPECT_CKR_OK(g_fns->C_DestroyObject(session_, private_key_));
+    }
+  }
+  bool valid() const { return (public_key_ != INVALID_OBJECT_HANDLE); }
+  CK_OBJECT_HANDLE public_handle() const { return public_key_; }
+  CK_OBJECT_HANDLE private_handle() const { return private_key_; }
+
+ private:
+  CK_SESSION_HANDLE session_;
+  ObjectAttributes public_attrs_;
+  ObjectAttributes private_attrs_;
+  CK_OBJECT_HANDLE public_key_;
+  CK_OBJECT_HANDLE private_key_;
+};
+
 // Test fixture for tests involving a secret key.
 class SecretKeyTest : public ReadOnlySessionTest,
                       public ::testing::WithParamInterface<std::string> {

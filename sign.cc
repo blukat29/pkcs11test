@@ -57,6 +57,29 @@ class SignTest : public ReadOnlySessionTest,
   CK_MECHANISM mechanism_;
 };
 
+class ECSignTest : public ReadOnlySessionTest,
+                 public ::testing::WithParamInterface<string> {
+ public:
+  ECSignTest()
+    : info_(kCurveInfo[GetParam()]),
+      public_attrs_({CKA_VERIFY}),
+      private_attrs_({CKA_SIGN}),
+      keypair_(session_, public_attrs_, private_attrs_, hex_decode(info_.params),
+               info_.keygen_mechanism, info_.key_type),
+      datalen_(32),
+      data_(randmalloc(datalen_)),
+      mechanism_({info_.sign_mechanism, NULL_PTR, 0}) {
+  }
+ protected:
+  CurveInfo info_;
+  vector<CK_ATTRIBUTE_TYPE> public_attrs_;
+  vector<CK_ATTRIBUTE_TYPE> private_attrs_;
+  ECKeyPair keypair_;
+  const int datalen_;
+  unique_ptr<CK_BYTE, freer> data_;
+  CK_MECHANISM mechanism_;
+};
+
 }  // namespace
 
 #define SKIP_IF_UNIMPLEMENTED_RV(rv) \
@@ -151,6 +174,24 @@ INSTANTIATE_TEST_CASE_P(Signatures, SignTest,
                                           "SHA256-RSA",
                                           "SHA384-RSA",
                                           "SHA512-RSA"));
+
+TEST_P(ECSignTest, SignVerify) {
+  CK_RV rv = g_fns->C_SignInit(session_, &mechanism_, keypair_.private_handle());
+  SKIP_IF_UNIMPLEMENTED_RV(rv);
+  ASSERT_CKR_OK(rv);
+  CK_BYTE output[300];
+  CK_ULONG output_len = sizeof(output);
+  EXPECT_CKR_OK(g_fns->C_Sign(session_, data_.get(), datalen_, output, &output_len));
+
+  ASSERT_CKR_OK(g_fns->C_VerifyInit(session_, &mechanism_, keypair_.public_handle()));
+  EXPECT_CKR_OK(g_fns->C_Verify(session_, data_.get(), datalen_, output, output_len));
+}
+
+INSTANTIATE_TEST_CASE_P(ECSignatures, ECSignTest,
+                        ::testing::Values("P-256",
+                                          "P-384",
+                                          "P-521",
+                                          "secp256k1"));
 
 }  // namespace test
 }  // namespace pkcs11
