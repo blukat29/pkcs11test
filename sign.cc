@@ -191,7 +191,8 @@ INSTANTIATE_TEST_CASE_P(ECSignatures, ECSignTest,
                         ::testing::Values("P-256",
                                           "P-384",
                                           "P-521",
-                                          "secp256k1"));
+                                          "secp256k1",
+                                          "ed25519"));
 
 }  // namespace test
 }  // namespace pkcs11

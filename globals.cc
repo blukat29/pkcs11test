@@ -53,6 +53,7 @@ std::map<std::string, CurveInfo> kCurveInfo = {
   {"P-384", { CKM_EC_KEY_PAIR_GEN, CKM_ECDSA, CKK_EC, "06052b81040022"}},
   {"P-521", { CKM_EC_KEY_PAIR_GEN, CKM_ECDSA, CKK_EC, "06052b81040023"}},
   {"secp256k1", { CKM_EC_KEY_PAIR_GEN, CKM_ECDSA, CKK_EC, "06052b8104000a"}},
+  {"ed25519", { CKM_EC_EDWARDS_KEY_PAIR_GEN, CKM_EDDSA, CKK_EC_EDWARDS, "06032b6570"}},
 };
 
 std::map<std::string, CipherInfo> kCipherInfo = {
