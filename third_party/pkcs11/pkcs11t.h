@@ -414,6 +414,7 @@ typedef CK_ULONG          CK_KEY_TYPE;
 /* ARIA is new for PKCS #11 v2.20 amendment 3 */
 #define CKK_ARIA                       0x00000026
 
+#define CKK_EC_EDWARDS          0x00000040
 
 #define CKK_VENDOR_DEFINED  0x80000000
 
@@ -951,6 +952,8 @@ typedef CK_ULONG          CK_MECHANISM_TYPE;
 #define CKM_ECDH1_DERIVE               0x00001050
 #define CKM_ECDH1_COFACTOR_DERIVE      0x00001051
 #define CKM_ECMQV_DERIVE               0x00001052
+#define CKM_EC_EDWARDS_KEY_PAIR_GEN    0x00001055
+#define CKM_EDDSA                      0x00001057
 
 #define CKM_JUNIPER_KEY_GEN            0x00001060
 #define CKM_JUNIPER_ECB128             0x00001061
@@ -1893,5 +1896,13 @@ typedef struct CK_ARIA_CBC_ENCRYPT_DATA_PARAMS {
 } CK_ARIA_CBC_ENCRYPT_DATA_PARAMS;
 
 typedef CK_ARIA_CBC_ENCRYPT_DATA_PARAMS CK_PTR CK_ARIA_CBC_ENCRYPT_DATA_PARAMS_PTR;
+
+typedef struct CK_EDDSA_PARAMS {
+    CK_BBOOL phFlag;
+    CK_ULONG ulContextDataLen;
+    CK_BYTE_PTR pContextData;
+} CK_EDDSA_PARAMS;
+
+typedef CK_EDDSA_PARAMS CK_PTR CK_EDDSA_PARAMS_PTR;
 
 #endif
