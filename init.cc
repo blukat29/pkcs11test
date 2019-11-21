@@ -40,7 +40,7 @@ TEST(Init, Uninitialized) {
              g_fns->C_OpenSession(g_slot_id, flags, NULL_PTR, NULL_PTR, &session));
   EXPECT_CKR(CKR_CRYPTOKI_NOT_INITIALIZED, g_fns->C_CloseSession(1));
 
-  CK_MECHANISM mechanism;
+  CK_MECHANISM mechanism = {CKM_RSA_PKCS_KEY_PAIR_GEN, NULL_PTR, 0};
   EXPECT_CKR(CKR_CRYPTOKI_NOT_INITIALIZED, g_fns->C_EncryptInit(1, &mechanism, 1));
 
   CK_OBJECT_CLASS data_class = CKO_DATA;
