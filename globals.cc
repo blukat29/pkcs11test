@@ -43,9 +43,11 @@ std::map<std::string, SignatureInfo> kSignatureInfo = {
   {"RSA", {CKM_RSA_PKCS, 64}},
   {"MD5-RSA", {CKM_MD5_RSA_PKCS, 1024}},
   {"SHA1-RSA", {CKM_SHA1_RSA_PKCS, 1024}},
+  {"SHA224-RSA", {CKM_SHA224_RSA_PKCS, 1024}},
   {"SHA256-RSA", {CKM_SHA256_RSA_PKCS, 1024}},
   {"SHA384-RSA", {CKM_SHA384_RSA_PKCS, 1024}},
   {"SHA512-RSA", {CKM_SHA512_RSA_PKCS, 1024}},
+  {"x509-RSA", {CKM_RSA_X_509, 32}},
 };
 
 std::map<std::string, CurveInfo> kCurveInfo = {

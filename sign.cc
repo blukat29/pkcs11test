@@ -91,6 +91,7 @@ class ECSignTest : public ReadOnlySessionTest,
     }
 
 TEST_P(SignTest, SignVerify) {
+  cout << "Algorithm: " << GetParam() << endl;
   CK_RV rv = g_fns->C_SignInit(session_, &mechanism_, keypair_.private_handle());
   SKIP_IF_UNIMPLEMENTED_RV(rv);
   ASSERT_CKR_OK(rv);
@@ -169,13 +170,16 @@ TEST_F(ReadOnlySessionTest, SignVerifyRecover) {
 
 INSTANTIATE_TEST_CASE_P(Signatures, SignTest,
                         ::testing::Values("RSA",
+                                          "x509-RSA",
                                           "MD5-RSA",
                                           "SHA1-RSA",
+                                          "SHA224-RSA",
                                           "SHA256-RSA",
                                           "SHA384-RSA",
                                           "SHA512-RSA"));
 
 TEST_P(ECSignTest, SignVerify) {
+  cout << "Algorithm: " << GetParam() << endl;
   CK_RV rv = g_fns->C_SignInit(session_, &mechanism_, keypair_.private_handle());
   SKIP_IF_UNIMPLEMENTED_RV(rv);
   ASSERT_CKR_OK(rv);
