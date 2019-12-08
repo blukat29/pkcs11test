@@ -52,16 +52,24 @@ static CK_BYTE aes_gcm_aad[] = {0xd6,0x09,0xb1,0xf0,0x56,0x63,0x7a,0x0d,0x46,0xd
 static CK_GCM_PARAMS aes_gcm_param = {aes_gcm_iv, sizeof(aes_gcm_iv), 0, aes_gcm_aad, sizeof(aes_gcm_aad), 128};
 
 map<string, vector<TestData> > kTestVectors = {
+  // NIST SP 500-20
   { "DES-ECB", {{"8000000000000000", "", "0000000000000000", "95A8D72813DAA94D"},
                 {"4000000000000000", "", "0000000000000000", "0EEC1487DD8C26D5"}, }},
   { "3DES-ECB", {{"800000000000000000000000000000000000000000000000", "", "0000000000000000", "95A8D72813DAA94D"},
                  {"020202020202020202020202020202020202020202020202", "", "0202020202020202", "E127C2B61D98E6E2"}, }},
-  { "AES-ECB", {{"2b7e151628aed2a6abf7158809cf4f3c", "", "6bc1bee22e409f96e93d7e117393172a", "3ad77bb40d7a3660a89ecaf32466ef97"},
+  // FIPS SP 800-38A
+  { "AES-128-ECB", {{"2b7e151628aed2a6abf7158809cf4f3c", "", "6bc1bee22e409f96e93d7e117393172a", "3ad77bb40d7a3660a89ecaf32466ef97"},
                 {"2b7e151628aed2a6abf7158809cf4f3c", "", "ae2d8a571e03ac9c9eb76fac45af8e51", "f5d3d58503b9699de785895a96fdbaaf"}, }},
-  { "AES-CBC", {{"2b7e151628aed2a6abf7158809cf4f3c", "000102030405060708090A0B0C0D0E0F", "6bc1bee22e409f96e93d7e117393172a", "7649abac8119b246cee98e9b12e9197d"},
+  { "AES-192-ECB", {{"8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b", "", "6bc1bee22e409f96e93d7e117393172a", "bd334f1d6e45f25ff712a214571fa5cc"}, }},
+  { "AES-256-ECB", {{"603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4", "", "6bc1bee22e409f96e93d7e117393172a", "f3eed1bdb5d2a03c064b5a7e3db181f8"}, }},
+  { "AES-128-CBC", {{"2b7e151628aed2a6abf7158809cf4f3c", "000102030405060708090A0B0C0D0E0F", "6bc1bee22e409f96e93d7e117393172a", "7649abac8119b246cee98e9b12e9197d"},
                 {"2b7e151628aed2a6abf7158809cf4f3c", "7649ABAC8119B246CEE98E9B12E9197D", "ae2d8a571e03ac9c9eb76fac45af8e51", "5086cb9b507219ee95db113a917678b2"}, }},
-  { "AES-CTR", {{"2b7e151628aed2a6abf7158809cf4f3c", "", "6bc1bee22e409f96e93d7e117393172a", "874d6191b620e3261bef6864990db6ce", &aes_ctr_param, sizeof(aes_ctr_param)}, }},
-  { "AES-GCM", {{"ad7a2bd03eac835a6f620fdcb506b345", "", "08000f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a0002",
+  { "AES-128-CTR", {{"2b7e151628aed2a6abf7158809cf4f3c", "", "6bc1bee22e409f96e93d7e117393172a", "874d6191b620e3261bef6864990db6ce", &aes_ctr_param, sizeof(aes_ctr_param)}, }},
+  // Project wycheproof
+  { "AES-128-CBC-PAD", {{"e09eaa5a3f5e56d279d5e7a03373f6ea", "c9ee3cd746bf208c65ca9e72a266d54f", "ef4eab37181f98423e53e947e7050fd0", "d1fa697f3e2e04d64f1a0da203813ca5bc226a0b1d42287b2a5b994a66eaf14a"},
+                        {"481440298525cc261f8159159aedf62d", "ce91e0454b0123f1ead0f158826459e9", "6123c556c5cc", "f080e487f4e5b7aed793ea95ffe4bb30"}, }},
+  // IEEE 802.1 MACsec GCM-AES Test Vectors
+  { "AES-128-GCM", {{"ad7a2bd03eac835a6f620fdcb506b345", "", "08000f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a0002",
                  "701afa1cc039c0d765128a665dab69243899bf7318ccdc81c9931da17fbe8edd7d17cb8b4c26fc81e3284f2b7fba713d4f8d55e7d3f06fd5a13c0c29b9d5b880",
                  &aes_gcm_param, sizeof(aes_gcm_param)}, }},
 };
@@ -628,6 +636,7 @@ TEST_F(ReadOnlySessionTest, SecretKeyTestVectors) {
   for (const auto& kv : kTestVectors) {
     vector<TestData> testcases = kTestVectors[kv.first];
     CipherInfo info = kCipherInfo[kv.first];
+    cout << "Cipher: " << kv.first << endl;
     for (const TestData& testcase : kv.second) {
       if (g_verbose) {
         cout  << "KEY: " << testcase.key << endl;
